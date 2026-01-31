@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五子棋游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .game-info {
+            background: rgba(255,255,255,0.9);
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .player-piece {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+        
+        .player-piece.black {
+            background: #000;
+        }
+        
+        .player-piece.white {
+            background: #fff;
+        }
+        
+        .player-info.active .player-piece {
+            box-shadow: 0 0 10px 3px #ffd700;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .board-container {
+            background: #dcb35c;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        #board {
+            display: grid;
+            grid-template-columns: repeat(15, 36px);
+            grid-template-rows: repeat(15, 36px);
+            gap: 0;
+            background: #dcb35c;
+            position: relative;
+        }
+        
+        .cell {
+            width: 36px;
+            height: 36px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .cell::before,
+        .cell::after {
+            content: '';
+            position: absolute;
+            background: #8b6914;
+        }
+        
+        .cell::before {
+            width: 100%;
+            height: 1px;
+            top: 50%;
+            left: 0;
+        }
+        
+        .cell::after {
+            width: 1px;
+            height: 100%;
+            left: 50%;
+            top: 0;
+        }
+        
+        .cell:hover::before {
+            background: #ff6b6b;
+        }
+        
+        .cell:hover::after {
+            background: #ff6b6b;
+        }
+        
+        .piece {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .piece.black {
+            background: radial-gradient(circle at 30% 30%, #666, #000);
+        }
+        
+        .piece.white {
+            background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+            border: 1px solid #999;
+        }
+        
+        .piece.last-move {
+            box-shadow: 0 0 0 3px #ff6b6b;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        button {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .btn-new {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-new:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-undo {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .btn-undo:hover {
+            background: #e68900;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .winner-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .winner-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            animation: popIn 0.3s;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .winner-content h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .winner-content .winner-piece {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .winner-content .winner-piece.black {
+            background: radial-gradient(circle at 30% 30%, #666, #000);
+        }
+        
+        .winner-content .winner-piece.white {
+            background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+            border: 2px solid #999;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 五子棋游戏</h1>
+    
+    <div class="game-info">
+        <div class="player-info active" id="player1">
+            <div class="player-piece black"></div>
+            <span>黑棋</span>
+        </div>
+        <div class="player-info" id="player2">
+            <div class="player-piece white"></div>
+            <span>白棋</span>
+        </div>
+    </div>
+    
+    <div class="board-container">
+        <div id="board"></div>
+    </div>
+    
+    <div class="controls">
+        <button class="btn-new" onclick="newGame()">🔄 重新开始</button>
+        <button class="btn-undo" onclick="undoMove()">↩️ 悔棋</button>
+    </div>
+    
+    <div class="winner-modal" id="winnerModal">
+        <div class="winner-content">
+            <h2>🎉 游戏结束!</h2>
+            <div class="winner-piece" id="winnerPiece"></div>
+            <p id="winnerText" style="font-size: 24px; margin-bottom: 20px;"></p>
+            <button class="btn-new" onclick="closeModal(); newGame();">再来一局</button>
+        </div>
+    </div>
+
+    <script>
+        const BOARD_SIZE = 15;
+        let board = [];
+        let currentPlayer = 'black';
+        let gameOver = false;
+        let moveHistory = [];
+        
+        // 初始化棋盘
+        function initBoard() {
+            const boardElement = document.getElementById('board');
+            boardElement.innerHTML = '';
+            board = [];
+            
+            for (let i = 0; i < BOARD_SIZE; i++) {
+                board[i] = [];
+                for (let j = 0; j < BOARD_SIZE; j++) {
+                    board[i][j] = null;
+                    
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.onclick = () => makeMove(i, j);
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+        
+        // 下棋
+        function makeMove(row, col) {
+            if (gameOver || board[row][col]) return;
+            
+            board[row][col] = currentPlayer;
+            moveHistory.push({row, col, player: currentPlayer});
+            
+            // 移除之前的最后一步标记
+            document.querySelectorAll('.piece.last-move').forEach(p => p.classList.remove('last-move'));
+            
+            // 创建棋子
+            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            const piece = document.createElement('div');
+            piece.className = `piece ${currentPlayer} last-move`;
+            cell.appendChild(piece);
+            
+            // 检查胜负
+            if (checkWin(row, col)) {
+                gameOver = true;
+                showWinner(currentPlayer);
+                return;
+            }
+            
+            // 切换玩家
+            currentPlayer = currentPlayer === 'black' ? 'white' : 'black';
+            updatePlayerInfo();
+        }
+        
+        // 更新玩家信息显示
+        function updatePlayerInfo() {
+            document.getElementById('player1').classList.toggle('active', currentPlayer === 'black');
+            document.getElementById('player2').classList.toggle('active', currentPlayer === 'white');
+        }
+        
+        // 检查胜负
+        function checkWin(row, col) {
+            const directions = [
+                [[0, 1], [0, -1]],   // 水平
+                [[1, 0], [-1, 0]],   // 垂直
+                [[1, 1], [-1, -1]],  // 对角线
+                [[1, -1], [-1, 1]]   // 反对角线
+            ];
+            
+            const player = board[row][col];
+            
+            for (let dir of directions) {
+                let count = 1;
+                
+                for (let [dr, dc] of dir) {
+                    let r = row + dr;
+                    let c = col + dc;
+                    
+                    while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
+                        count++;
+                        r += dr;
+                        c += dc;
+                    }
+                }
+                
+                if (count >= 5) return true;
+            }
+            
+            return false;
+        }
+        
+        // 显示获胜者
+        function showWinner(winner) {
+            const modal = document.getElementById('winnerModal');
+            const piece = document.getElementById('winnerPiece');
+            const text = document.getElementById('winnerText');
+            
+            piece.className = `winner-piece ${winner}`;
+            text.textContent = winner === 'black' ? '黑棋获胜!' : '白棋获胜!';
+            modal.style.display = 'flex';
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('winnerModal').style.display = 'none';
+        }
+        
+        // 新游戏
+        function newGame() {
+            gameOver = false;
+            currentPlayer = 'black';
+            moveHistory = [];
+            initBoard();
+            updatePlayerInfo();
+            closeModal();
+        }
+        
+        // 悔棋
+        function undoMove() {
+            if (moveHistory.length === 0 || gameOver) return;
+            
+            const lastMove = moveHistory.pop();
+            board[lastMove.row][lastMove.col] = null;
+            
+            const cell = document.querySelector(`[data-row="${lastMove.row}"][data-col="${lastMove.col}"]`);
+            const piece = cell.querySelector('.piece');
+            if (piece) piece.remove();
+            
+            currentPlayer = lastMove.player;
+            updatePlayerInfo();
+            
+            // 标记新的最后一步
+            if (moveHistory.length > 0) {
+                const prevMove = moveHistory[moveHistory.length - 1];
+                const prevCell = document.querySelector(`[data-row="${prevMove.row}"][data-col="${prevMove.col}"]`);
+                const prevPiece = prevCell.querySelector('.piece');
+                if (prevPiece) prevPiece.classList.add('last-move');
+            }
+        }
+        
+        // 初始化
+        initBoard();
+    </script>
+</body>
+</html>
