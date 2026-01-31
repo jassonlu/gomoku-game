@@ -27,17 +27,25 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
-        .game-mode {
+        .game-settings {
             background: rgba(255,255,255,0.9);
             padding: 10px 25px;
             border-radius: 25px;
             margin-bottom: 15px;
             display: flex;
-            gap: 15px;
+            gap: 25px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .setting-group {
+            display: flex;
+            gap: 10px;
             align-items: center;
         }
         
-        .game-mode label {
+        .setting-group label {
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -45,29 +53,16 @@
             gap: 5px;
         }
         
-        .game-mode input[type="radio"] {
+        .setting-group input[type="radio"] {
             cursor: pointer;
         }
         
-        .difficulty {
-            background: rgba(255,255,255,0.9);
-            padding: 8px 20px;
-            border-radius: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .difficulty label {
-            font-weight: bold;
-        }
-        
-        .difficulty select {
+        .setting-group select {
             padding: 5px 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
             cursor: pointer;
+            font-size: 14px;
         }
         
         .game-info {
@@ -329,18 +324,20 @@
 <body>
     <h1>🎮 五子棋游戏</h1>
     
-    <div class="game-mode">
-        <label><input type="radio" name="mode" value="pvp" checked onchange="changeMode()"> 双人对战</label>
-        <label><input type="radio" name="mode" value="pvai" onchange="changeMode()"> 人机对战</label>
-    </div>
-    
-    <div class="difficulty" id="difficultyPanel" style="display: none;">
-        <label>AI难度：</label>
-        <select id="aiLevel" onchange="changeDifficulty()">
-            <option value="easy">简单</option>
-            <option value="medium" selected>中等</option>
-            <option value="hard">困难</option>
-        </select>
+    <div class="game-settings">
+        <div class="setting-group">
+            <label>模式：</label>
+            <label><input type="radio" name="mode" value="pvp" checked onchange="changeMode()"> 双人对战</label>
+            <label><input type="radio" name="mode" value="pvai" onchange="changeMode()"> 人机</label>
+        </div>
+        <div class="setting-group" id="difficultyPanel" style="display: none;">
+            <label>难度：</label>
+            <select id="aiLevel" onchange="changeDifficulty()">
+                <option value="easy">简单</option>
+                <option value="medium" selected>中等</option>
+                <option value="hard">困难</option>
+            </select>
+        </div>
     </div>
     
     <div class="game-info">
