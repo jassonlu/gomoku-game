@@ -118,15 +118,21 @@
         }
 
         .thinking {
-            display: none;
+            display: flex;
             align-items: center;
             gap: 8px;
             color: #ff6b6b;
             font-weight: bold;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s;
+            min-width: 80px; /* 固定宽度，避免布局变化 */
+            justify-content: center;
         }
-
+        
         .thinking.active {
-            display: flex;
+            opacity: 1;
+            visibility: visible;
         }
 
         .thinking-dots {
@@ -543,20 +549,20 @@
                 padding: 15px 15px 120px 15px;
                 background-attachment: fixed;
             }
-            
+
             .controls {
                 padding: 12px 15px;
                 gap: 10px;
                 border-radius: 30px;
             }
-            
+
             .controls button {
                 padding: 10px 14px;
                 min-width: 62px;
                 font-size: 12px;
                 gap: 5px;
             }
-            
+
             .controls button .icon {
                 font-size: 18px;
             }
