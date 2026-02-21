@@ -264,6 +264,16 @@
             color: white;
         }
 
+        .btn-exit {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .btn-exit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
         .winner-modal {
             display: none;
             position: fixed;
@@ -625,7 +635,10 @@
             <h2>🎉 游戏结束!</h2>
             <div class="winner-piece" id="winnerPiece"></div>
             <p id="winnerText" style="font-size: 24px; margin-bottom: 20px;"></p>
-            <button class="btn-new" onclick="closeModal(); newGame();">再来一局</button>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn-new" onclick="closeModal(); newGame();">再来一局</button>
+                <button class="btn-exit" onclick="exitGame();">退出游戏</button>
+            </div>
         </div>
     </div>
 
@@ -982,6 +995,17 @@
         // 关闭弹窗
         function closeModal() {
             document.getElementById('winnerModal').style.display = 'none';
+        }
+
+        // 退出游戏
+        function exitGame() {
+            if (confirm('确定要退出游戏吗？')) {
+                closeModal();
+                // 清空棋盘但保持界面
+                gameOver = true;
+                document.getElementById('board').style.opacity = '0.5';
+                // 可以在这里添加更多退出逻辑，比如返回主菜单等
+            }
         }
 
         // 新游戏
